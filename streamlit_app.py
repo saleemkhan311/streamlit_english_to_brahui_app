@@ -136,8 +136,8 @@ def main():
     input_text = st.text_area('Enter English Text:', '')
     if st.button('Translate'):
         preprocessed_text = preprocess_text(input_text)
-        clean = handle_key_error(preprocess_text,input_lang)
-        output_words, decoder_attn = evaluate(encoder, decoder, preprocessed_text)
+        clean = handle_key_error(preprocessed_text,input_lang)
+        output_words, decoder_attn = evaluate(encoder, decoder, clean)
         print("Output words: ",output_words)
         # Check if each word is a string before joining
         output_text = ' '.join(output_words)
