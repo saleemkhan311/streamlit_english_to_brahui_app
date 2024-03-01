@@ -115,12 +115,28 @@ decoder = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=dropout_p)
 encoder.load_state_dict(torch.load('model_weights/encoder.pth', map_location='cpu'))
 decoder.load_state_dict(torch.load('model_weights/decoder.pth', map_location='cpu'))
 
+def handle_key_error(input_sentence, lang):
+    words = input_sentence.split()
+    clean_words = []
+    for word in words:
+        try:
+            lang.word2index[word]  # Check if the word exists in the dictionary
+            clean_words.append(word)
+        except KeyError:
+            pass  # Ignore the word if it is not found in the dictionary
+    clean_sentence = ' '.join(clean_words)
+    print(input_sentence)
+    print(clean_sentence)
+    return clean_sentence
+
 # Streamlit app
 def main():
     st.title('English to Brahui Translation App')
+    st.write("This is a BETA App Expected Accuracy is around 50%")
     input_text = st.text_area('Enter English Text:', '')
     if st.button('Translate'):
         preprocessed_text = preprocess_text(input_text)
+        clean = handle_key_error(preprocess_text,input_lang)
         output_words, decoder_attn = evaluate(encoder, decoder, preprocessed_text)
         print("Output words: ",output_words)
         # Check if each word is a string before joining
