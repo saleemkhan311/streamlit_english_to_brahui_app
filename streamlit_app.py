@@ -4,8 +4,8 @@ import re
 import string
 from string import digits
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+#from fastapi import FastAPI, HTTPException
+#from pydantic import BaseModel
 
 import torch
 from torch.autograd import Variable
@@ -14,7 +14,7 @@ from EncoderRNN import EncoderRNN
 from AttnDecoderRNN import AttnDecoderRNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
+#print(device)
 
 SOS_token = 0
 EOS_token = 1
