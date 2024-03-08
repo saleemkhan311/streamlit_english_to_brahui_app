@@ -4,8 +4,10 @@ import re
 import string
 from string import digits
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+#from fastapi import FastAPI, HTTPException
+#from pydantic import BaseModel
+
+from flask import Flask, request, jsonify, render_template
 
 import torch
 from torch.autograd import Variable
