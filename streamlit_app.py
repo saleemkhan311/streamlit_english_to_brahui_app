@@ -146,6 +146,25 @@ def translate():
     output_text = ' '.join(output_words)
     return jsonify({'translation': output_text})
 
+
+import socket
+
+def find_unused_port():
+    max_port = 65535  # Maximum port number
+    for port in range(49152, max_port + 1):  # Start from the dynamic/private port range
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('localhost', port))
+            return port
+        except OSError:
+            pass
+    raise ValueError("Could not find an unused port.")
+
+# Example usage: find an unused port automatically
+unused_port = find_unused_port()
+print(f"Unused port found: {unused_port}")
+
+
 # Streamlit app
 def main():
     st.title('English to Brahui Translation App')
@@ -179,4 +198,4 @@ if __name__ == '__main__':
     main()
 
 
-app.run(port=5000)
+app.run(port=unused_port)
