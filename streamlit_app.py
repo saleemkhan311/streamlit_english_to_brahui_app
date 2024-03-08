@@ -150,7 +150,7 @@ def translate():
 def main():
     st.title('English to Brahui Translation App')
     st.write("This is a BETA App Expected Accuracy is around 50%")
-    st.write("Testing Update")
+    st.write("Testing Flask")
     input_text = st.text_area('Enter English Text:', '')
     if st.button('Translate'):
         preprocessed_text = preprocess_text(input_text)
