@@ -22,6 +22,8 @@ SOS_token = 0
 EOS_token = 1
 MAX_LENGTH = 30
 
+app = Flask(__name__)
+
 # Load language objects
 with open('input_lang.pkl', 'rb') as f:
     input_lang = pickle.load(f)
@@ -70,7 +72,7 @@ def variable_from_sentence(lang, sentence):
 
 # Evaluation function
 def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
-    print("Input Sentence:", sentence)
+    #print("Input Sentence:", sentence)
     with torch.no_grad():
         input_tensor = tensorFromSentence(input_lang, sentence)
         input_length = input_tensor.size()[0]
@@ -106,7 +108,7 @@ def evaluate(encoder, decoder, sentence, max_length=MAX_LENGTH):
             if '<EOS>' in decoded_words:
                 decoded_words.remove('<EOS>')
 
-        print("Decoded Words:", decoded_words)
+        #print("Decoded Words:", decoded_words)
         return decoded_words, decoder_attentions[:di + 1]
     
 attn_model = 'general'
@@ -130,9 +132,19 @@ def handle_key_error(input_sentence, lang):
         except KeyError:
             pass  # Ignore the word if it is not found in the dictionary
     clean_sentence = ' '.join(clean_words)
-    print(input_sentence)
-    print(clean_sentence)
+    #print(input_sentence)
+    #print(clean_sentence)
     return clean_sentence
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    data = request.get_json()
+    input_text = data['text']
+    preprocessed_text = preprocess_text(input_text)
+    clean = handle_key_error(preprocessed_text, input_lang)
+    output_words, decoder_attn = evaluate(encoder, decoder, clean)
+    output_text = ' '.join(output_words)
+    return jsonify({'translation': output_text})
 
 # Streamlit app
 def main():
@@ -144,7 +156,7 @@ def main():
         preprocessed_text = preprocess_text(input_text)
         clean = handle_key_error(preprocessed_text,input_lang)
         output_words, decoder_attn = evaluate(encoder, decoder, clean)
-        print("Output words: ",output_words)
+        #print("Output words: ",output_words)
         # Check if each word is a string before joining
         output_text = ' '.join(output_words)
         #st.write('Translated Text:', output_text)
@@ -165,3 +177,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+app.run(port=5000)
