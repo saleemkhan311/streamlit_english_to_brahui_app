@@ -4,11 +4,6 @@ import re
 import string
 from string import digits
 
-#from fastapi import FastAPI, HTTPException
-#from pydantic import BaseModel
-
-from flask import Flask, request, jsonify, render_template
-
 import torch
 from torch.autograd import Variable
 from lang import Lang
@@ -16,13 +11,10 @@ from EncoderRNN import EncoderRNN
 from AttnDecoderRNN import AttnDecoderRNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#print(device)
 
 SOS_token = 0
 EOS_token = 1
 MAX_LENGTH = 30
-
-app = Flask(__name__)
 
 # Load language objects
 with open('input_lang.pkl', 'rb') as f:
@@ -132,44 +124,16 @@ def handle_key_error(input_sentence, lang):
         except KeyError:
             pass  # Ignore the word if it is not found in the dictionary
     clean_sentence = ' '.join(clean_words)
-    #print(input_sentence)
-    #print(clean_sentence)
     return clean_sentence
 
-@app.route('/translate', methods=['POST'])
-def translate():
-    data = request.get_json()
-    input_text = data['text']
-    preprocessed_text = preprocess_text(input_text)
-    clean = handle_key_error(preprocessed_text, input_lang)
-    output_words, decoder_attn = evaluate(encoder, decoder, clean)
-    output_text = ' '.join(output_words)
-    return jsonify({'translation': output_text})
 
 
-import socket
-
-def find_unused_port():
-    max_port = 65535  # Maximum port number
-    for port in range(49152, max_port + 1):  # Start from the dynamic/private port range
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('localhost', port))
-            return port
-        except OSError:
-            pass
-    raise ValueError("Could not find an unused port.")
-
-# Example usage: find an unused port automatically
-unused_port = find_unused_port()
-print(f"Unused port found: {unused_port}")
 
 
 # Streamlit app
 def main():
     st.title('English to Brahui Translation App')
     st.write("This is a BETA App Expected Accuracy is around 50%")
-    st.write("Testing Flask")
     input_text = st.text_area('Enter English Text:', '')
     if st.button('Translate'):
         preprocessed_text = preprocess_text(input_text)
@@ -197,5 +161,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-app.run(port=unused_port)
